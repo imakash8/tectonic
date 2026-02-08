@@ -3,19 +3,109 @@ import { useTradeStore } from '../store'
 import { apiService } from '../services/api'
 import './Trading.css'
 
-// Common stock symbols for autocomplete
-const COMMON_SYMBOLS = [
-  'AAPL', 'MSFT', 'GOOGL', 'GOOG', 'AMZN', 'NVDA', 'TSLA', 'META', 'AVGO', 'ASML',
-  'NFLX', 'PYPL', 'INTC', 'AMD', 'QCOM', 'CSCO', 'ADBE', 'CRM', 'ORCL', 'IBM',
-  'BA', 'CAT', 'DD', 'GE', 'MMM', 'JNJ', 'KO', 'PG', 'WMT', 'MCD',
-  'NIKE', 'ADIDAS', 'LULU', 'ULTA', 'NKE', 'TJX', 'HD', 'LOW', 'DG', 'AZO',
-  'JPM', 'BAC', 'WFC', 'GS', 'MS', 'C', 'USB', 'PNC', 'BLK', 'BX',
-  'XOM', 'CVX', 'COP', 'MPC', 'HES', 'EOG', 'SLB', 'HAL', 'OKE', 'PSX',
-  'VRTX', 'GILD', 'BIIB', 'AMGN', 'LLY', 'PFE', 'ABBV', 'JNJ', 'MRNA', 'BNTX',
-  'TSLA', 'GM', 'F', 'LCID', 'RIVN', 'CCIV', 'NIO', 'XPE', 'LI', 'XPEV',
-  'SPY', 'QQQ', 'IWM', 'EEM', 'GLD', 'TLT', 'HYG', 'LQD', 'AGG', 'IVV',
-  'COIN', 'MSTR', 'RIOT', 'MARA', 'CLSK', 'HUT', 'CORE', 'CIFR', 'SATS', 'MRKR'
-].sort()
+// Stock symbols with company names for autocomplete
+const STOCK_DATA = [
+  { symbol: 'AAPL', company: 'Apple Inc.' },
+  { symbol: 'MSFT', company: 'Microsoft Corp.' },
+  { symbol: 'GOOGL', company: 'Alphabet Inc.' },
+  { symbol: 'GOOG', company: 'Alphabet Inc.' },
+  { symbol: 'AMZN', company: 'Amazon.com Inc.' },
+  { symbol: 'NVDA', company: 'NVIDIA Corp.' },
+  { symbol: 'TSLA', company: 'Tesla Inc.' },
+  { symbol: 'META', company: 'Meta Platforms Inc.' },
+  { symbol: 'AVGO', company: 'Broadcom Inc.' },
+  { symbol: 'ASML', company: 'ASML Holding N.V.' },
+  { symbol: 'NFLX', company: 'Netflix Inc.' },
+  { symbol: 'PYPL', company: 'PayPal Holdings Inc.' },
+  { symbol: 'INTC', company: 'Intel Corp.' },
+  { symbol: 'AMD', company: 'Advanced Micro Devices Inc.' },
+  { symbol: 'QCOM', company: 'Qualcomm Inc.' },
+  { symbol: 'CSCO', company: 'Cisco Systems Inc.' },
+  { symbol: 'ADBE', company: 'Adobe Inc.' },
+  { symbol: 'CRM', company: 'Salesforce Inc.' },
+  { symbol: 'ORCL', company: 'Oracle Corp.' },
+  { symbol: 'IBM', company: 'IBM Corp.' },
+  { symbol: 'BA', company: 'Boeing Co.' },
+  { symbol: 'CAT', company: 'Caterpillar Inc.' },
+  { symbol: 'DD', company: 'DuPont de Nemours Inc.' },
+  { symbol: 'GE', company: 'General Electric Co.' },
+  { symbol: 'MMM', company: '3M Co.' },
+  { symbol: 'JNJ', company: 'Johnson & Johnson' },
+  { symbol: 'KO', company: 'The Coca-Cola Co.' },
+  { symbol: 'PG', company: 'Procter & Gamble Co.' },
+  { symbol: 'WMT', company: 'Walmart Inc.' },
+  { symbol: 'MCD', company: "McDonald's Corp." },
+  { symbol: 'NKE', company: 'Nike Inc.' },
+  { symbol: 'LULU', company: 'Lululemon Athletica Inc.' },
+  { symbol: 'ULTA', company: 'Ulta Beauty Inc.' },
+  { symbol: 'TJX', company: 'TJX Companies Inc.' },
+  { symbol: 'HD', company: 'The Home Depot Inc.' },
+  { symbol: 'LOW', company: "Lowe's Companies Inc." },
+  { symbol: 'DG', company: 'Dollar General Corp.' },
+  { symbol: 'AZO', company: 'AutoZone Inc.' },
+  { symbol: 'JPM', company: 'JPMorgan Chase & Co.' },
+  { symbol: 'BAC', company: 'Bank of America Corp.' },
+  { symbol: 'WFC', company: 'Wells Fargo & Co.' },
+  { symbol: 'GS', company: 'Goldman Sachs Group Inc.' },
+  { symbol: 'MS', company: 'Morgan Stanley' },
+  { symbol: 'C', company: 'Citigroup Inc.' },
+  { symbol: 'USB', company: 'U.S. Bancorp' },
+  { symbol: 'PNC', company: 'PNC Financial Services Group Inc.' },
+  { symbol: 'BLK', company: 'BlackRock Inc.' },
+  { symbol: 'BX', company: 'Blackstone Inc.' },
+  { symbol: 'XOM', company: 'ExxonMobil Corp.' },
+  { symbol: 'CVX', company: 'Chevron Corp.' },
+  { symbol: 'COP', company: 'ConocoPhillips' },
+  { symbol: 'MPC', company: 'Marathon Petroleum Corp.' },
+  { symbol: 'HES', company: 'Hess Corp.' },
+  { symbol: 'EOG', company: 'EOG Resources Inc.' },
+  { symbol: 'SLB', company: 'Schlumberger N.V.' },
+  { symbol: 'HAL', company: 'Halliburton Co.' },
+  { symbol: 'OKE', company: 'ONEOK Inc.' },
+  { symbol: 'PSX', company: 'Phillips 66' },
+  { symbol: 'VRTX', company: 'Vertex Pharmaceuticals Inc.' },
+  { symbol: 'GILD', company: 'Gilead Sciences Inc.' },
+  { symbol: 'BIIB', company: 'Biogen Inc.' },
+  { symbol: 'AMGN', company: 'Amgen Inc.' },
+  { symbol: 'LLY', company: 'Eli Lilly & Co.' },
+  { symbol: 'PFE', company: 'Pfizer Inc.' },
+  { symbol: 'ABBV', company: 'AbbVie Inc.' },
+  { symbol: 'MRNA', company: 'Moderna Inc.' },
+  { symbol: 'BNTX', company: 'BioNTech SE' },
+  { symbol: 'GM', company: 'General Motors Co.' },
+  { symbol: 'F', company: 'Ford Motor Co.' },
+  { symbol: 'LCID', company: 'Lucid Group Inc.' },
+  { symbol: 'RIVN', company: 'Rivian Automotive Inc.' },
+  { symbol: 'NIO', company: 'NIO Inc.' },
+  { symbol: 'LI', company: 'Li Auto Inc.' },
+  { symbol: 'XPEV', company: 'XPeng Inc.' },
+  { symbol: 'SPY', company: 'SPDR S&P 500 ETF Trust' },
+  { symbol: 'QQQ', company: 'Invesco QQQ Trust' },
+  { symbol: 'IWM', company: 'iShares Russell 2000 ETF' },
+  { symbol: 'EEM', company: 'iShares MSCI Emerging Markets ETF' },
+  { symbol: 'GLD', company: 'SPDR Gold Shares' },
+  { symbol: 'TLT', company: 'iShares 20+ Year Treasury Bond ETF' },
+  { symbol: 'HYG', company: 'iShares High Yield Corp Bond ETF' },
+  { symbol: 'LQD', company: 'iShares Investment Grade Corp Bond ETF' },
+  { symbol: 'AGG', company: 'iShares Core U.S. Aggregate Bond ETF' },
+  { symbol: 'IVV', company: 'iShares Core S&P 500 ETF' },
+  { symbol: 'COIN', company: 'Coinbase Global Inc.' },
+  { symbol: 'MSTR', company: 'MicroStrategy Inc.' },
+  { symbol: 'RIOT', company: 'Riot Blockchain Inc.' },
+  { symbol: 'MARA', company: 'Marathon Digital Holdings Inc.' },
+  { symbol: 'CLSK', company: 'CleanSpark Inc.' },
+  { symbol: 'HUT', company: 'Hut 8 Mining Corp.' },
+  { symbol: 'CORE', company: 'Core Scientific Inc.' },
+  { symbol: 'CIFR', company: 'Cipher Mining Inc.' },
+]
+
+const COMMON_SYMBOLS = STOCK_DATA.map(s => s.symbol).sort()
+
+// Helper function to get company name for symbol
+const getCompanyName = (symbol) => {
+  const stock = STOCK_DATA.find(s => s.symbol === symbol)
+  return stock ? stock.company : ''
+}
 
 export default function Trading() {
   const [symbol, setSymbol] = useState('')
@@ -293,15 +383,19 @@ export default function Trading() {
                 
                 {showSymbolSuggestions && filteredSymbols.length > 0 && (
                   <div className="symbol-dropdown">
-                    {filteredSymbols.slice(0, 10).map((sym, index) => (
-                      <div
-                        key={index}
-                        className="symbol-option"
-                        onClick={() => selectSymbol(sym)}
-                      >
-                        {sym}
-                      </div>
-                    ))}
+                    {filteredSymbols.slice(0, 10).map((sym, index) => {
+                      const company = getCompanyName(sym)
+                      return (
+                        <div
+                          key={index}
+                          className="symbol-option"
+                          onClick={() => selectSymbol(sym)}
+                        >
+                          <div className="symbol-ticker">{sym}</div>
+                          <div className="symbol-company">{company}</div>
+                        </div>
+                      )
+                    })}
                     {filteredSymbols.length > 10 && (
                       <div className="symbol-option-count">
                         +{filteredSymbols.length - 10} more
