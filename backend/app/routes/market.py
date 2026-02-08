@@ -25,11 +25,22 @@ async def get_quote(symbol: str):
         
         return quote
         
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Error fetching quote: {str(e)}")
+        error_msg = str(e)
+        logger.error(f"Error fetching quote for {symbol}: {error_msg}")
+        
+        # Provide helpful error message
+        if "FINNHUB_API_KEY" in error_msg or "not configured" in error_msg:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=f"Market data service unavailable. API key not configured. Please contact support. Error: {error_msg}"
+            )
+        
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e)
+            detail=f"Unable to fetch market data for {symbol}. {error_msg}"
         )
 
 @router.get("/profile/{symbol}")
@@ -46,11 +57,22 @@ async def get_company_profile(symbol: str):
         
         return profile
         
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Error fetching company profile: {str(e)}")
+        error_msg = str(e)
+        logger.error(f"Error fetching company profile for {symbol}: {error_msg}")
+        
+        # Provide helpful error message
+        if "FINNHUB_API_KEY" in error_msg or "not configured" in error_msg:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=f"Market data service unavailable. API key not configured. Please contact support. Error: {error_msg}"
+            )
+        
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e)
+            detail=f"Unable to fetch company profile for {symbol}. {error_msg}"
         )
 
 @router.get("/overview")
