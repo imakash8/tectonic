@@ -231,8 +231,6 @@ class MarketDataService:
             logger.error(f"Error fetching news for {symbol}: {str(e)}")
             return []
     
-    def _get_mock_quote(self, symbol: str) -> Dict[str, Any]:
-    
     async def get_crypto_price(self, symbol: str) -> Optional[Dict[str, Any]]:
         """Get cryptocurrency price (placeholder)"""
         return None
