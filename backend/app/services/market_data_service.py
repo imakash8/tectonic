@@ -23,44 +23,47 @@ class MarketDataService:
     
     async def get_quote(self, symbol: str) -> Optional[Dict[str, Any]]:
         """
-        Get current quote for symbol from Finnhub or Alpha Vantage
+        Get current quote for symbol from Finnhub (REAL DATA ONLY)
         
         Returns standardized quote data with current_price, high, low, etc.
-        Falls back to mock data if no API key is configured
+        Raises exception if API data cannot be retrieved.
         """
         
-        if not settings.USE_REAL_TIME_DATA:
-            return self._get_mock_quote(symbol)
+        # Check cache first
+        if symbol in self.cache:
+            cached_data, cache_time = self.cache[symbol]
+            if (datetime.utcnow() - cache_time).total_seconds() < self.cache_ttl:
+                logger.debug(f"Returning cached quote for {symbol}")
+                return cached_data
         
         try:
-            # Check cache first
-            if symbol in self.cache:
-                cached_data, cache_time = self.cache[symbol]
-                if (datetime.utcnow() - cache_time).total_seconds() < self.cache_ttl:
-                    logger.debug(f"Returning cached quote for {symbol}")
-                    return cached_data
-            
-            # Try Finnhub first (real-time)
+            # Try Finnhub first (real-time, primary source)
             if self.finnhub_key and self.finnhub_key != "your_finnhub_key_here":
                 quote = await self._get_finnhub_quote(symbol)
                 if quote:
                     self.cache[symbol] = (quote, datetime.utcnow())
+                    logger.info(f"Successfully fetched real quote for {symbol} from Finnhub: ${quote['current_price']}")
                     return quote
+                else:
+                    logger.error(f"Finnhub returned no data for {symbol}")
             
-            # Fallback to Alpha Vantage (15min delayed)
+            # Fallback to Alpha Vantage (15min delayed, real data)
             if self.alpha_vantage_key and self.alpha_vantage_key != "your_alpha_vantage_key_here":
                 quote = await self._get_alpha_vantage_quote(symbol)
                 if quote:
                     self.cache[symbol] = (quote, datetime.utcnow())
+                    logger.info(f"Successfully fetched real quote for {symbol} from Alpha Vantage: ${quote['current_price']}")
                     return quote
+                else:
+                    logger.error(f"Alpha Vantage returned no data for {symbol}")
             
-            # If no real API configured, return mock
-            logger.warning(f"No real API configured, returning mock data for {symbol}")
-            return self._get_mock_quote(symbol)
+            # If we reach here, no real API data available
+            logger.error(f"CRITICAL: Unable to fetch real market data for {symbol} - all APIs failed or not configured")
+            raise Exception(f"Unable to fetch real market data for {symbol}. Please ensure FINNHUB_API_KEY or ALPHA_VANTAGE_KEY is properly configured.")
                 
         except Exception as e:
-            logger.error(f"Error fetching quote for {symbol}: {str(e)}")
-            return self._get_mock_quote(symbol)
+            logger.error(f"CRITICAL ERROR fetching quote for {symbol}: {str(e)}")
+            raise Exception(f"Market data unavailable for {symbol}: {str(e)}")
     
     async def _get_finnhub_quote(self, symbol: str) -> Optional[Dict[str, Any]]:
         """Fetch quote from Finnhub API (real-time)"""
@@ -155,7 +158,7 @@ class MarketDataService:
         return None
     
     async def get_company_profile(self, symbol: str) -> Optional[Dict[str, Any]]:
-        """Get company profile/info from Finnhub API with fallback to mock data"""
+        """Get company profile/info from Finnhub API (REAL DATA ONLY)"""
         
         # Try Finnhub first if API key is configured
         if self.finnhub_key and self.finnhub_key != "your_finnhub_key_here":
@@ -184,22 +187,22 @@ class MarketDataService:
                             "website": data.get("weburl", "")
                         }
                         
-                        logger.info(f"Fetched profile for {symbol}: {profile['name']}")
+                        logger.info(f"Fetched real profile for {symbol}: {profile['name']}")
                         return profile
                     else:
-                        logger.warning(f"No profile data from Finnhub for: {symbol}")
+                        logger.error(f"Finnhub returned no profile data for: {symbol}")
                     
             except httpx.HTTPStatusError as e:
                 if e.response.status_code == 429:
-                    logger.warning(f"Finnhub rate limit reached for profile")
+                    logger.error(f"Finnhub rate limit reached for profile of {symbol}")
                 else:
-                    logger.warning(f"Finnhub API error: {e.response.status_code} for profile")
+                    logger.error(f"Finnhub API error {e.response.status_code} for profile of {symbol}")
             except Exception as e:
-                logger.warning(f"Error fetching profile from Finnhub for {symbol}: {str(e)}")
+                logger.error(f"Error fetching profile from Finnhub for {symbol}: {str(e)}")
         
-        # Fall back to mock profile data
-        logger.info(f"Returning mock profile data for {symbol}")
-        return self._get_mock_profile(symbol)
+        # If we reach here, real API data is unavailable
+        logger.error(f"CRITICAL: Unable to fetch real company profile for {symbol} - Finnhub API not configured or failed")
+        raise Exception(f"Unable to fetch company profile for {symbol}. Please ensure FINNHUB_API_KEY is properly configured.")
     
     async def get_news(self, symbol: str, limit: int = 10) -> List[Dict[str, Any]]:
         """Get recent news for symbol from Finnhub"""
@@ -229,132 +232,6 @@ class MarketDataService:
             return []
     
     def _get_mock_quote(self, symbol: str) -> Dict[str, Any]:
-        """
-        Fallback mock data for testing/development
-        Returns consistent mock data based on symbol
-        """
-        
-        import random
-        
-        # Consistent mock prices based on symbol
-        symbol_hash = hash(symbol.upper()) % 100
-        base_price = 100 + (symbol_hash * 1.5)
-        variation = random.uniform(-5, 5)
-        current = base_price + variation
-        
-        return {
-            "symbol": symbol.upper(),
-            "current_price": round(current, 2),
-            "high": round(current + 10, 2),
-            "low": round(current - 10, 2),
-            "open": round(base_price, 2),
-            "prev_close": round(base_price - 2, 2),
-            "timestamp": datetime.utcnow(),
-            "currency": "USD",
-            "source": "mock",
-            "note": "Mock data - API key not configured"
-        }
-    
-    def _get_mock_profile(self, symbol: str) -> Dict[str, Any]:
-        """
-        Mock company profile data for testing/development
-        """
-        
-        # Mock company profiles
-        mock_profiles = {
-            "AAPL": {
-                "name": "Apple Inc.",
-                "description": "Apple Inc. designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories worldwide.",
-                "logo": "https://logo.clearbit.com/apple.com",
-                "exchange": "NASDAQ",
-                "country": "US",
-                "industry": "Consumer Electronics",
-                "website": "https://www.apple.com"
-            },
-            "MSFT": {
-                "name": "Microsoft Corporation",
-                "description": "Microsoft Corporation develops, licenses, and supports software, services and devices worldwide.",
-                "logo": "https://logo.clearbit.com/microsoft.com",
-                "exchange": "NASDAQ",
-                "country": "US",
-                "industry": "Software",
-                "website": "https://www.microsoft.com"
-            },
-            "TSLA": {
-                "name": "Tesla, Inc.",
-                "description": "Tesla, Inc. designs, develops, manufactures, leases, and sells electric vehicles.",
-                "logo": "https://logo.clearbit.com/tesla.com",
-                "exchange": "NASDAQ",
-                "country": "US",
-                "industry": "Automotive",
-                "website": "https://www.tesla.com"
-            },
-            "GOOGL": {
-                "name": "Alphabet Inc.",
-                "description": "Alphabet Inc. offers various products and platforms in the United States, Europe, and internationally.",
-                "logo": "https://logo.clearbit.com/google.com",
-                "exchange": "NASDAQ",
-                "country": "US",
-                "industry": "Information Technology",
-                "website": "https://www.alphabet.com"
-            },
-            "AMZN": {
-                "name": "Amazon.com, Inc.",
-                "description": "Amazon.com, Inc. engages in the retail sale of consumer products and subscriptions in North America and internationally.",
-                "logo": "https://logo.clearbit.com/amazon.com",
-                "exchange": "NASDAQ",
-                "country": "US",
-                "industry": "Retail",
-                "website": "https://www.amazon.com"
-            },
-            "META": {
-                "name": "Meta Platforms, Inc.",
-                "description": "Meta Platforms, Inc. engages in the development of products that enable people to connect and share with friends and family through mobile devices.",
-                "logo": "https://logo.clearbit.com/meta.com",
-                "exchange": "NASDAQ",
-                "country": "US",
-                "industry": "Internet Services",
-                "website": "https://www.meta.com"
-            },
-            "NVDA": {
-                "name": "NVIDIA Corporation",
-                "description": "NVIDIA Corporation provides graphics, and compute and networking solutions in the United States, Taiwan, China, and internationally.",
-                "logo": "https://logo.clearbit.com/nvidia.com",
-                "exchange": "NASDAQ",
-                "country": "US",
-                "industry": "Semiconductors",
-                "website": "https://www.nvidia.com"
-            },
-            "JPM": {
-                "name": "JPMorgan Chase & Co.",
-                "description": "JPMorgan Chase & Co. operates as a financial services company worldwide.",
-                "logo": "https://logo.clearbit.com/jpmorganchase.com",
-                "exchange": "NYSE",
-                "country": "US",
-                "industry": "Financial Services",
-                "website": "https://www.jpmorganchase.com"
-            }
-        }
-        
-        symbol_upper = symbol.upper()
-        
-        if symbol_upper in mock_profiles:
-            return {
-                "symbol": symbol_upper,
-                **mock_profiles[symbol_upper]
-            }
-        
-        # Generic mock profile for unknown symbols
-        return {
-            "symbol": symbol_upper,
-            "name": f"{symbol_upper} Corp.",
-            "description": f"Public company trading under symbol {symbol_upper}",
-            "logo": f"https://logo.clearbit.com/{symbol_upper.lower()}.com",
-            "exchange": "NASDAQ",
-            "country": "US",
-            "industry": "Unknown",
-            "website": f"https://www.{symbol_upper.lower()}.com"
-        }
     
     async def get_crypto_price(self, symbol: str) -> Optional[Dict[str, Any]]:
         """Get cryptocurrency price (placeholder)"""

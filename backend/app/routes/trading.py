@@ -23,6 +23,8 @@ async def execute_trade(
 ):
     """Execute a new trade with real market data from Finnhub"""
     try:
+        logger.info(f"Trade execution request for {request.symbol} by user {current_user.id}")
+        
         # Verify portfolio ownership
         portfolio = db.query(Portfolio).filter(
             Portfolio.id == request.portfolio_id,
@@ -45,25 +47,27 @@ async def execute_trade(
         
         engine = TradingEngine(db)
         
-        # Fetch real market data from Finnhub API
-        live_quote = await market_data_service.get_quote(request.symbol)
-        
-        if not live_quote:
+        # Fetch real market data from Finnhub API (MUST succeed)
+        try:
+            live_quote = await market_data_service.get_quote(request.symbol)
+            logger.info(f"Fetched real quote for {request.symbol}: ${live_quote.get('current_price')} (source: {live_quote.get('source')})")
+        except Exception as quote_error:
+            logger.error(f"CRITICAL: Failed to fetch real market data for {request.symbol}: {str(quote_error)}")
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Unable to fetch market data for {request.symbol}"
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=f"Unable to fetch real market data for {request.symbol}. Please ensure API keys are configured and markets are open. Error: {str(quote_error)}"
             )
         
-        # Use real market data for validation
+        # Use real market data for validation (NO hardcoded fallbacks)
         from datetime import datetime
         market_data = {
-            "current_price": live_quote.get("current_price", request.entry_price),
-            "high": live_quote.get("high", request.entry_price * 1.02),
-            "low": live_quote.get("low", request.entry_price * 0.98),
-            "prev_close": live_quote.get("prev_close", request.entry_price),
-            "volume": live_quote.get("volume", 5000000),
+            "current_price": live_quote.get("current_price"),
+            "high": live_quote.get("high"),
+            "low": live_quote.get("low"),
+            "prev_close": live_quote.get("prev_close"),
+            "volume": live_quote.get("volume"),
             "volatility": live_quote.get("volatility", 0.2),
-            "vix": 20,  # Standard estimate
+            "vix": 20,  # Market volatility proxy
             "market_open": True,
             "entry_price": request.entry_price,
             "stop_loss": request.stop_loss,
@@ -71,7 +75,7 @@ async def execute_trade(
             "direction": request.direction,
             "ai_confidence": request.ai_confidence,
             "quote_timestamp": live_quote.get("timestamp") or datetime.utcnow(),
-            "quote_source": live_quote.get("source", "unknown"),
+            "quote_source": live_quote.get("source"),
             "timeframe": "day"
         }
         

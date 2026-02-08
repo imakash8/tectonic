@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     # Real-time Data Configuration
     PREFERRED_MARKET_DATA_PROVIDER: str = "finnhub"  # Options: "alpha_vantage", "finnhub"
     MARKET_DATA_CACHE_TTL: int = 30  # Cache for 30 seconds
-    USE_REAL_TIME_DATA: bool = True  # Set to False for demo/testing
+    USE_REAL_TIME_DATA: bool = True  # ALWAYS TRUE - System uses only real market data
     
     # JWT
     SECRET_KEY: str = "your-secret-key-change-in-production"
