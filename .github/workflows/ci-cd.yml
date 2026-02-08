@@ -194,14 +194,12 @@ jobs:
     needs: [backend-tests, frontend-tests]
     runs-on: ubuntu-latest
     name: Deploy to Production
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main'
     
     steps:
-    - uses: actions/checkout@v4
-    
     - name: Deployment Info
       run: |
         echo "✓ Deployment handled by Render"
-        echo "✓ Backend auto-deploys to: https://tectonic-4prz.onrender.com"
-        echo "✓ Frontend auto-deploys to: Render static site"
-        echo "✓ No manual deployment needed"
+        echo "✓ Backend: https://tectonic-4prz.onrender.com"
+        echo "✓ Frontend: Auto-deployed on Render"
+        echo "✓ CI/CD: Tests passed - deployment ready"
