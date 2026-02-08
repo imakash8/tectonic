@@ -1,0 +1,258 @@
+.analysis-container {
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.analysis-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.analysis-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #1a1a1a;
+}
+
+.signal-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.indicators-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.indicator-card {
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+  transition: all 0.3s;
+}
+
+.indicator-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+.indicator-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.indicator-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+}
+
+.indicator-bar {
+  margin-bottom: 1rem;
+}
+
+.rsi-gauge {
+  display: flex;
+  height: 30px;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  background: linear-gradient(
+    to right,
+    #ef4444 0%,
+    #ef4444 30%,
+    #eab308 30%,
+    #eab308 70%,
+    #10b981 70%,
+    #10b981 100%
+  );
+}
+
+.gauge-zone {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  color: white;
+  font-weight: 600;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.gauge-zone.oversold,
+.gauge-zone.overbought {
+  display: none;
+}
+
+.gauge-pointer {
+  position: absolute;
+  width: 3px;
+  height: 100%;
+  background: black;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+.macd-values {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 4px;
+}
+
+.macd-line,
+.signal-line,
+.histogram {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.macd-line span:first-child,
+.signal-line span:first-child,
+.histogram span:first-child {
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.value {
+  font-family: monospace;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.value.positive {
+  color: #10b981;
+}
+
+.value.negative {
+  color: #ef4444;
+}
+
+.volume-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 4px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.stat-row span:first-child {
+  color: #6b7280;
+}
+
+.stat-row span:last-child {
+  font-weight: 600;
+  font-family: monospace;
+}
+
+.stat-row span.above {
+  color: #10b981;
+}
+
+.stat-row span.below {
+  color: #ef4444;
+}
+
+.stat-row .positive {
+  color: #10b981;
+}
+
+.stat-row .negative {
+  color: #ef4444;
+}
+
+.indicator-signal {
+  padding: 0.75rem;
+  background: #f0f9ff;
+  border-left: 3px solid #3b82f6;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0c63e4;
+  text-align: center;
+}
+
+.analysis-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btn-refresh {
+  padding: 0.5rem 1rem;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-refresh:hover {
+  background-color: #2563eb;
+}
+
+.timestamp {
+  font-size: 0.85rem;
+  color: #999;
+}
+
+.error-message {
+  background-color: #fee;
+  color: #c00;
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  border-left: 3px solid #c00;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .analysis-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .indicators-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .analysis-footer {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+}

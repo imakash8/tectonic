@@ -1,0 +1,22 @@
+# Render.com configuration
+databases:
+  - name: tectonic_db
+    databaseName: tectonic
+    user: tectonic_user
+    plan: free
+
+services:
+  - type: web
+    name: tectonic-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: tectonic_db
+          property: connectionString
+      - key: DEBUG
+        value: "False"
+      - key: ENVIRONMENT
+        value: production

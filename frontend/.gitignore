@@ -1,0 +1,21 @@
+# Frontend build and dependencies
+node_modules/
+dist/
+*.local
+.vite/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

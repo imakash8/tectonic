@@ -1,0 +1,162 @@
+.watchlist-container {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.watchlist-header {
+  margin-bottom: 2rem;
+}
+
+.watchlist-header h2 {
+  font-size: 2rem;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+}
+
+.watchlist-count {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.watchlist-input {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.symbol-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.symbol-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.btn-add {
+  padding: 0.75rem 1.5rem;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-add:hover {
+  background-color: #2563eb;
+}
+
+.error-message {
+  background-color: #fee;
+  color: #c00;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border-left: 4px solid #c00;
+}
+
+.watchlist-items {
+  display: grid;
+  gap: 1rem;
+}
+
+.watchlist-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.watchlist-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-color: #3b82f6;
+}
+
+.item-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.item-symbol {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.item-date {
+  font-size: 0.85rem;
+  color: #999;
+  margin-top: 0.25rem;
+}
+
+.btn-remove {
+  background-color: #f3f4f6;
+  border: none;
+  color: #ef4444;
+  font-size: 1.2rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-remove:hover {
+  background-color: #ef4444;
+  color: white;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  background: #f9fafb;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+}
+
+.empty-state p {
+  color: #666;
+  font-size: 1rem;
+}
+
+.empty-hint {
+  color: #999;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .watchlist-container {
+    padding: 1rem;
+  }
+
+  .watchlist-input {
+    flex-direction: column;
+  }
+
+  .watchlist-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .btn-remove {
+    align-self: flex-end;
+    margin-top: 0.5rem;
+  }
+}

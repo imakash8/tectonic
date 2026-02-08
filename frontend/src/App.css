@@ -1,0 +1,64 @@
+/* App-level styles */
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+.main-content {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Ensure root and body fill viewport */
+#root {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+body {
+  width: 100%;
+  height: 100vh;
+  overflow-x: hidden;
+}
+
+html {
+  width: 100%;
+  height: 100%;
+}
+
+/* Make sure React Router works properly */
+div {
+  flex-shrink: 0;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .app-container {
+    width: 100%;
+    overflow-x: hidden;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    flex-direction: column;
+    width: 100vw;
+    overflow-x: hidden;
+  }
+
+  .app-container {
+    width: 100vw;
+    overflow-x: hidden;
+  }}
