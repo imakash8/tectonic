@@ -109,8 +109,8 @@ publicApi.interceptors.response.use(
 
 export const apiService = {
   // === Authentication ===
-  register: (email, password) => 
-    api.post('/auth/register', { email, password }),
+  register: (email, password, fullName) => 
+    api.post('/auth/register', { email, password, full_name: fullName }),
   
   login: (email, password) => 
     api.post('/auth/login', { email, password }),
