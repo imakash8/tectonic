@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
     # CORS
-    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:8000"
+    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:8000,https://tectonic-frontend.onrender.com,http://127.0.0.1:5173,http://localhost:5173"
     
     class Config:
         env_file = ".env"
