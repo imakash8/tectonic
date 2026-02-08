@@ -58,7 +58,7 @@ async def execute_trade(
                 detail=f"Unable to fetch real market data for {request.symbol}. Please ensure API keys are configured and markets are open. Error: {str(quote_error)}"
             )
         
-        # Use real market data for validation (NO hardcoded fallbacks)
+        # Use ONLY real market data from API (NO hardcoded fallbacks)
         from datetime import datetime
         market_data = {
             "current_price": live_quote.get("current_price"),
@@ -66,8 +66,7 @@ async def execute_trade(
             "low": live_quote.get("low"),
             "prev_close": live_quote.get("prev_close"),
             "volume": live_quote.get("volume"),
-            "volatility": live_quote.get("volatility", 0.2),
-            "vix": 20,  # Market volatility proxy
+            "volatility": live_quote.get("volatility"),
             "market_open": True,
             "entry_price": request.entry_price,
             "stop_loss": request.stop_loss,
@@ -152,16 +151,15 @@ async def execute_paper_trade(
                 detail=f"Unable to fetch market data for {request.symbol}"
             )
         
-        # Use real market data for validation
+        # Use ONLY real market data from API (NO hardcoded fallbacks)
         from datetime import datetime
         market_data = {
-            "current_price": live_quote.get("current_price", request.entry_price),
-            "high": live_quote.get("high", request.entry_price * 1.02),
-            "low": live_quote.get("low", request.entry_price * 0.98),
-            "prev_close": live_quote.get("prev_close", request.entry_price),
-            "volume": live_quote.get("volume", 5000000),
-            "volatility": live_quote.get("volatility", 0.2),
-            "vix": 20,
+            "current_price": live_quote.get("current_price"),
+            "high": live_quote.get("high"),
+            "low": live_quote.get("low"),
+            "prev_close": live_quote.get("prev_close"),
+            "volume": live_quote.get("volume"),
+            "volatility": live_quote.get("volatility"),
             "market_open": True,
             "entry_price": request.entry_price,
             "stop_loss": request.stop_loss,
@@ -169,7 +167,7 @@ async def execute_paper_trade(
             "direction": request.direction,
             "ai_confidence": request.ai_confidence,
             "quote_timestamp": live_quote.get("timestamp") or datetime.utcnow(),
-            "quote_source": live_quote.get("source", "unknown"),
+            "quote_source": live_quote.get("source"),
             "timeframe": "day"
         }
         
