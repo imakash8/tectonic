@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="32" height="32">
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="48" fill="#1e40af" opacity="0.95"/>
+  
+  <!-- Gradient for electric effect -->
+  <defs>
+    <linearGradient id="electricGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e40af;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Lightning bolt / Trading chart hybrid -->
+  <path d="M 50 20 L 65 45 L 50 45 L 70 80 L 45 50 L 50 50 Z" fill="#fbbf24" stroke="#f59e0b" stroke-width="1.5"/>
+  
+  <!-- Upward trend arrow -->
+  <path d="M 35 60 L 50 45 L 65 60" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Outer glow -->
+  <circle cx="50" cy="50" r="48" fill="none" stroke="#3b82f6" stroke-width="1" opacity="0.5"/>
+</svg>
