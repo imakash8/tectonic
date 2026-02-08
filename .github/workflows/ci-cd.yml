@@ -195,29 +195,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Deploy to Production
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    continue-on-error: true
     
     steps:
     - uses: actions/checkout@v4
     
-    - name: Log production deployment
+    - name: Deployment Info
       run: |
-        echo "Production deployment placeholder"
-        echo "In production, this would deploy to your hosting platform"
-        echo "Currently using Render for automatic deployments"
-    
-    - name: Deploy to production
-      run: |
-        echo "Deploying to production..."
-        # Add your production deployment script here
-    
-    - name: Verify deployment
-      run: |
-        echo "Verifying production deployment..."
-        # Add your production verification script here
-    
-    - name: Notify Slack
-      if: success()
-      run: |
-        echo "Deployment successful!"
-        # Add your Slack notification here
+        echo "✓ Deployment handled by Render"
+        echo "✓ Backend auto-deploys to: https://tectonic-4prz.onrender.com"
+        echo "✓ Frontend auto-deploys to: Render static site"
+        echo "✓ No manual deployment needed"
