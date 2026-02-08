@@ -72,9 +72,19 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
 async def register(request: RegisterRequest, db: Session = Depends(get_db)):
     """Register a new user with email and password"""
     try:
+        logger.info(f"Registration attempt for email: {request.email}")
+        
+        # Validate password length
+        if len(request.password) < 8:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Password must be at least 8 characters"
+            )
+        
         # Check if user exists
         existing_user = db.query(User).filter(User.email == request.email).first()
         if existing_user:
+            logger.warning(f"Registration failed: Email already registered {request.email}")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email already registered"
@@ -85,25 +95,31 @@ async def register(request: RegisterRequest, db: Session = Depends(get_db)):
         user = User(
             email=request.email,
             password_hash=hashed_password,
-            full_name=request.full_name,
+            full_name=request.full_name or "User",
             is_active=True
         )
         
+        logger.info(f"Creating user: {request.email}")
         db.add(user)
         db.commit()
         db.refresh(user)
+        logger.info(f"User created successfully: {user.id} - {user.email}")
         
         # Create access token
         access_token = create_access_token(data={"sub": user.email})
         
-        return {
-            "id": user.id,
-            "email": user.email,
-            "full_name": user.full_name,
-            "access_token": access_token,
-            "refresh_token": access_token,
-            "token_type": "bearer"
-        }
+        response_data = TokenResponse(
+            id=user.id,
+            email=user.email,
+            full_name=user.full_name,
+            access_token=access_token,
+            refresh_token=access_token,
+            token_type="bearer"
+        )
+        
+        logger.info(f"Registration successful for: {user.email}")
+        return response_data
+        
     except HTTPException:
         raise
     except Exception as e:

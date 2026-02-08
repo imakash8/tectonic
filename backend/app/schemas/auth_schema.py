@@ -27,9 +27,9 @@ class TokenResponse(BaseModel):
     access_token: str
     refresh_token: Optional[str] = None
     token_type: str = "bearer"
-    id: int
-    email: str
-    full_name: Optional[str]
+    id: Optional[int] = None
+    email: Optional[str] = None
+    full_name: Optional[str] = None
 
 class UserResponse(BaseModel):
     id: int
