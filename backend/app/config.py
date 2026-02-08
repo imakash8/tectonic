@@ -4,7 +4,15 @@ Configuration settings for Tectonic Trading Platform Backend
 
 from pydantic_settings import BaseSettings
 from typing import Optional
+from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+# Load .env file from backend directory (works regardless of working directory)
+backend_dir = Path(__file__).parent.parent
+env_file = backend_dir / ".env"
+if env_file.exists():
+    load_dotenv(env_file, override=True)
 
 class Settings(BaseSettings):
     # Application
@@ -55,5 +63,7 @@ class Settings(BaseSettings):
         if isinstance(self.ALLOWED_ORIGINS, list):
             return self.ALLOWED_ORIGINS
         return [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",")]
+
+settings = Settings()
 
 settings = Settings()
