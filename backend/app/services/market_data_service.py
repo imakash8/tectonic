@@ -27,21 +27,15 @@ class MarketDataService:
         
         Returns standardized quote data with current_price, high, low, etc.
         Raises exception if API data cannot be retrieved.
-        """
         
-        # Check cache first
-        if symbol in self.cache:
-            cached_data, cache_time = self.cache[symbol]
-            if (datetime.utcnow() - cache_time).total_seconds() < self.cache_ttl:
-                logger.debug(f"Returning cached quote for {symbol}")
-                return cached_data
+        CACHING DISABLED - Always fetches live data from API on every request.
+        """
         
         try:
             # Try Finnhub first (real-time, primary source)
             if self.finnhub_key and self.finnhub_key != "your_finnhub_key_here":
                 quote = await self._get_finnhub_quote(symbol)
                 if quote:
-                    self.cache[symbol] = (quote, datetime.utcnow())
                     logger.info(f"Successfully fetched real quote for {symbol} from Finnhub: ${quote['current_price']}")
                     return quote
                 else:
@@ -51,7 +45,6 @@ class MarketDataService:
             if self.alpha_vantage_key and self.alpha_vantage_key != "your_alpha_vantage_key_here":
                 quote = await self._get_alpha_vantage_quote(symbol)
                 if quote:
-                    self.cache[symbol] = (quote, datetime.utcnow())
                     logger.info(f"Successfully fetched real quote for {symbol} from Alpha Vantage: ${quote['current_price']}")
                     return quote
                 else:

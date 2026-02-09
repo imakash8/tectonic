@@ -43,7 +43,7 @@ class Settings(BaseSettings):
     
     # Real-time Data Configuration
     PREFERRED_MARKET_DATA_PROVIDER: str = "finnhub"  # Options: "alpha_vantage", "finnhub"
-    MARKET_DATA_CACHE_TTL: int = 30  # Cache for 30 seconds
+    MARKET_DATA_CACHE_TTL: int = 0  # DISABLED - Always fetch live data from API
     USE_REAL_TIME_DATA: bool = True  # ALWAYS TRUE - System uses only real market data
     
     # JWT
