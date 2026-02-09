@@ -20,3 +20,13 @@ services:
         value: "False"
       - key: ENVIRONMENT
         value: production
+      - key: FINNHUB_API_KEY
+        sync: false
+      - key: ALPHA_VANTAGE_KEY
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: MARKET_DATA_CACHE_TTL
+        value: "0"
+      - key: ALLOWED_ORIGINS
+        value: "https://tectonic-frontend.onrender.com,https://yourdomain.com"
