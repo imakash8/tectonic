@@ -192,8 +192,10 @@ export default function Trading() {
         setCompanyProfile(null)
       }
     } catch (err) {
-      console.warn(`Failed to fetch quote for ${symbol}:`, err.message)
-      setError(`Could not find data for ${symbol}`)
+      const errorMsg = err.response?.data?.detail || err.message || 'Unknown error'
+      console.error(`Failed to fetch quote for ${symbol}:`, errorMsg)
+      console.error('Full error:', err)
+      setError(`Could not find data for ${symbol}. Error: ${errorMsg}`)
       setLiveQuote(null)
       setCompanyProfile(null)
     } finally {
