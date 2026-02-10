@@ -13,7 +13,7 @@ services:
     name: tectonic-frontend
     env: node
     buildCommand: cd frontend && npm install && npm run build
-    startCommand: npm run preview --host 0.0.0.0 --port 3000
+    startCommand: cd frontend && npx serve -s dist -l 3000
     envVars:
       - key: VITE_API_BASE_URL
         value: "https://tectonic-backend.onrender.com/api"
