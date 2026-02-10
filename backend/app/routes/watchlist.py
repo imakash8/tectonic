@@ -11,7 +11,7 @@ from app.models.user import User
 from app.routes.auth import get_current_user
 from pydantic import BaseModel
 
-router = APIRouter(prefix="/watchlist", tags=["watchlist"])
+router = APIRouter(prefix="/api/watchlist", tags=["watchlist"])
 
 class WatchlistItem(BaseModel):
     id: int
