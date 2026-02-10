@@ -91,3 +91,25 @@ async def health_check():
         "status": "healthy",
         "service": "Tectonic Trading Platform API"
     }
+
+@app.get("/health/db")
+async def health_check_db():
+    """Database health check endpoint"""
+    try:
+        db = SessionLocal()
+        # Try a simple query to verify database connection
+        db.execute("SELECT 1")
+        db.close()
+        
+        return {
+            "status": "healthy",
+            "database": "connected",
+            "database_url_configured": bool(settings.DATABASE_URL and settings.DATABASE_URL != "sqlite:///./tectonic.db")
+        }
+    except Exception as e:
+        logger.error(f"Database health check failed: {str(e)}")
+        return {
+            "status": "unhealthy",
+            "database": "disconnected",
+            "error": str(e)
+        }
