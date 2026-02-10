@@ -1,4 +1,6 @@
 # Render.com configuration
+# This file defines all services for the Tectonic Trading Platform
+
 databases:
   - name: tectonic_db
     databaseName: tectonic
@@ -6,6 +8,17 @@ databases:
     plan: free
 
 services:
+  # Frontend Service
+  - type: web
+    name: tectonic-frontend
+    env: node
+    buildCommand: cd frontend && npm install && npm run build
+    startCommand: npm run preview --host 0.0.0.0 --port 3000
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: "https://tectonic-backend.onrender.com/api"
+
+  # Backend Service
   - type: web
     name: tectonic-backend
     env: python
@@ -29,4 +42,4 @@ services:
       - key: MARKET_DATA_CACHE_TTL
         value: "0"
       - key: ALLOWED_ORIGINS
-        value: "https://tectonic-frontend.onrender.com,https://yourdomain.com"
+        value: "https://tectonic-frontend.onrender.com"
