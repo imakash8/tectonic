@@ -143,6 +143,9 @@ export const apiService = {
   getCompanyProfile: (symbol) => 
     publicApi.get(`/market/profile/${symbol}`),
   
+  searchSymbols: (query) => 
+    publicApi.get(`/market/search/${query}`),
+  
   getMarketOverview: () => 
     publicApi.get('/market/overview'),
   

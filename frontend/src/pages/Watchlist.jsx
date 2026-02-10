@@ -7,10 +7,24 @@ export default function Watchlist() {
   const [newSymbol, setNewSymbol] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchWatchlist();
   }, []);
+
+  // Debounced search for symbols
+  useEffect(() => {
+    if (newSymbol.length > 1) {
+      const timer = setTimeout(() => {
+        searchSymbols(newSymbol);
+      }, 300);
+      return () => clearTimeout(timer);
+    } else {
+      setSearchResults([]);
+    }
+  }, [newSymbol]);
 
   const fetchWatchlist = async () => {
     try {
@@ -31,15 +45,28 @@ export default function Watchlist() {
     }
   };
 
-  const addSymbol = async () => {
-    if (!newSymbol.trim()) {
+  const searchSymbols = async (query) => {
+    try {
+      const response = await api.get(`/market/search/${query.toUpperCase()}`);
+      setSearchResults(response.data.results || []);
+    } catch (err) {
+      console.error('Search error:', err);
+      setSearchResults([]);
+    }
+  };
+
+  const addSymbol = async (symbol = null) => {
+    const symbolToAdd = symbol || newSymbol.toUpperCase().trim();
+    
+    if (!symbolToAdd) {
       setError('Please enter a symbol');
       return;
     }
 
     try {
-      await api.post('/watchlist', { symbol: newSymbol.toUpperCase() });
+      await api.post('/watchlist', { symbol: symbolToAdd });
       setNewSymbol('');
+      setSearchResults([]);
       fetchWatchlist();
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to add symbol');
@@ -65,15 +92,34 @@ export default function Watchlist() {
       </div>
 
       <div className="watchlist-input">
-        <input
-          type="text"
-          value={newSymbol}
-          onChange={(e) => setNewSymbol(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && addSymbol()}
-          placeholder="Enter symbol (e.g., AAPL)"
-          className="symbol-input"
-        />
-        <button onClick={addSymbol} className="btn-add">
+        <div style={{ position: 'relative', flex: 1 }}>
+          <input
+            type="text"
+            value={newSymbol}
+            onChange={(e) => setNewSymbol(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && addSymbol()}
+            placeholder="Enter symbol (e.g., AAPL) or search by name"
+            className="symbol-input"
+          />
+          
+          {/* Search results dropdown */}
+          {searchResults.length > 0 && (
+            <div className="search-results-dropdown">
+              {searchResults.map((result) => (
+                <div
+                  key={result.symbol}
+                  className="search-result-item"
+                  onClick={() => addSymbol(result.symbol)}
+                >
+                  <span className="result-symbol">{result.symbol}</span>
+                  <span className="result-description">{result.description}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        
+        <button onClick={() => addSymbol()} className="btn-add">
           + Add to Watchlist
         </button>
       </div>

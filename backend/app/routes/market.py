@@ -111,3 +111,29 @@ async def get_crypto_price(symbol: str):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
         )
+
+@router.get("/search/{query}")
+async def search_symbols(query: str):
+    """Search for symbols by company name or symbol"""
+    try:
+        results = await market_service.search_symbols(query)
+        
+        if not results:
+            return {
+                "query": query,
+                "results": [],
+                "message": f"No symbols found for '{query}'"
+            }
+        
+        return {
+            "query": query,
+            "results": results,
+            "count": len(results)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error searching symbols: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Search failed: {str(e)}"
+        )

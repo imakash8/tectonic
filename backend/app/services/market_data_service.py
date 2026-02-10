@@ -258,5 +258,43 @@ class MarketDataService:
             logger.error(f"Error fetching market overview: {str(e)}")
             return {}
 
+    async def search_symbols(self, query: str) -> List[Dict[str, Any]]:
+        """Search for symbols by company name or symbol using Finnhub API"""
+        try:
+            if not self.finnhub_key or self.finnhub_key == "your_finnhub_key_here":
+                logger.error("FINNHUB_API_KEY not configured")
+                raise Exception("Finnhub API key not configured")
+            
+            async with httpx.AsyncClient(timeout=10) as client:
+                url = f"{self.finnhub_url}/search"
+                params = {
+                    "q": query.upper(),
+                    "token": self.finnhub_key
+                }
+                
+                response = await client.get(url, params=params)
+                response.raise_for_status()
+                data = response.json()
+                
+                results = []
+                if data.get('result'):
+                    for item in data.get('result', [])[:10]:  # Limit to 10 results
+                        results.append({
+                            "symbol": item.get('symbol'),
+                            "description": item.get('description'),
+                            "type": item.get('type'),
+                            "displaySymbol": item.get('displaySymbol')
+                        })
+                
+                logger.info(f"Found {len(results)} symbols for query: {query}")
+                return results
+                
+        except httpx.HTTPStatusError as e:
+            logger.error(f"Finnhub API error during search: {e.response.status_code}")
+            raise Exception(f"Finnhub API error: {e.response.status_code}")
+        except Exception as e:
+            logger.error(f"Error searching symbols: {str(e)}")
+            raise Exception(f"Symbol search failed: {str(e)}")
+
 # Create singleton instance
 market_data_service = MarketDataService()
