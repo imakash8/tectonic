@@ -1,14 +1,7 @@
-# Render.com configuration
-# This file defines all services for the Tectonic Trading Platform
-
-databases:
-  - name: tectonic_db
-    databaseName: tectonic
-    user: tectonic_user
-    plan: free
+# Render.com configuration for Tectonic Trading Platform
+# This is a simplified configuration that works reliably
 
 services:
-  # Backend Service
   - type: web
     name: tectonic-backend
     env: python
@@ -16,30 +9,16 @@ services:
     startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port 8000
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: tectonic_db
-          property: connectionString
-      - key: DEBUG
-        value: "False"
-      - key: ENVIRONMENT
-        value: production
+        sync: false
       - key: FINNHUB_API_KEY
-        value: ""
-      - key: ALPHA_VANTAGE_KEY
-        value: ""
+        sync: false
       - key: SECRET_KEY
-        value: "tectonic-trading-platform-secret-key-change-in-production"
+        sync: false
       - key: MARKET_DATA_CACHE_TTL
         value: "0"
       - key: ALLOWED_ORIGINS
         value: "https://tectonic-frontend.onrender.com"
-
-  # Frontend Service
-  - type: web
-    name: tectonic-frontend
-    env: node
-    buildCommand: cd frontend && npm install && npm run build
-    startCommand: cd frontend && npx serve -s dist -l 3000
-    envVars:
-      - key: VITE_API_BASE_URL
-        value: "https://tectonic-backend.onrender.com/api"
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: "False"
