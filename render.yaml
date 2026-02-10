@@ -8,16 +8,6 @@ databases:
     plan: free
 
 services:
-  # Frontend Service
-  - type: web
-    name: tectonic-frontend
-    env: node
-    buildCommand: cd frontend && npm install && npm run build
-    startCommand: cd frontend && npx serve -s dist -l 3000
-    envVars:
-      - key: VITE_API_BASE_URL
-        value: "https://tectonic-backend.onrender.com/api"
-
   # Backend Service
   - type: web
     name: tectonic-backend
@@ -34,12 +24,22 @@ services:
       - key: ENVIRONMENT
         value: production
       - key: FINNHUB_API_KEY
-        sync: false
+        value: ""
       - key: ALPHA_VANTAGE_KEY
-        sync: false
+        value: ""
       - key: SECRET_KEY
-        sync: false
+        value: "tectonic-trading-platform-secret-key-change-in-production"
       - key: MARKET_DATA_CACHE_TTL
         value: "0"
       - key: ALLOWED_ORIGINS
         value: "https://tectonic-frontend.onrender.com"
+
+  # Frontend Service
+  - type: web
+    name: tectonic-frontend
+    env: node
+    buildCommand: cd frontend && npm install && npm run build
+    startCommand: cd frontend && npx serve -s dist -l 3000
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: "https://tectonic-backend.onrender.com/api"
